@@ -14,14 +14,15 @@ pipeline {
 					}
 					steps {
 						bat "git submodule update --init --recursive"
-						bat "cd nishbox"
-						bat "premake5 vs2015 --engine=dynamic --opengl=gdi --cc=msc --prefix=C:/Games"
-						bat "msbuild nishbox.sln /p:Configuration=Release"
-						bat "pack -d data base.pak"
-						bat "cd .."
-						bat "cd nsis"
-						bat "makensis /DCONFIG=Release /DPLATFORM=Native install.nsi"
-						bat "move /y install.exe install32-vs2015.exe"
+						dir("nishbox") {
+							bat "premake5 vs2015 --engine=dynamic --opengl=gdi --cc=msc --prefix=C:/Games"
+							bat "msbuild nishbox.sln /p:Configuration=Release"
+							bat "pack -d data base.pak"
+						}
+						dir("nsis") {
+							bat "makensis /DCONFIG=Release /DPLATFORM=Native install.nsi"
+							bat "move /y install.exe install32-vs2015.exe"
+						}
 						archiveArtifacts(
 							"nsis/install32-vs2015.exe"
 						)
@@ -36,15 +37,16 @@ pipeline {
 					agent any
 					steps {
 						sh "git submodule update --init --recursive"
-						sh "cd nishbox"
-						sh "premake5 gmake --engine=dynamic --opengl=gdi --prefix=C:/Games"
-						sh "gmake config=release_win64 -j9"
-						sh "pack -d data base.pak"
-						sh "./tool/pack.sh Win64 nishbox nishbox64.zip"
-						sh "cd .."
-						sh "cd nsis"
-						sh "makensis -DCONFIG=Release -DPLATFORM=Win64 install.nsi"
-						sh "mv install.exe install64.exe"
+						dir("nishbox") {
+							sh "premake5 gmake --engine=dynamic --opengl=gdi --prefix=C:/Games"
+							sh "gmake config=release_win64 -j9"
+							sh "pack -d data base.pak"
+							sh "./tool/pack.sh Win64 nishbox nishbox64.zip"
+						}
+						dir("nsis") {
+							sh "makensis -DCONFIG=Release -DPLATFORM=Win64 install.nsi"
+							sh "mv install.exe install64.exe"
+						}
 						archiveArtifacts(
 							"nishbox/nishbox64.zip, nsis/install64.exe"
 						)
@@ -59,15 +61,16 @@ pipeline {
 					agent any
 					steps {
 						sh "git submodule update --init --recursive"
-						sh "cd nishbox"
-						sh "premake5 gmake --engine=dynamic --opengl=gdi --prefix=C:/Games"
-						sh "gmake config=release_win32 -j9"
-						sh "pack -d data base.pak"
-						sh "./tool/pack.sh Win32 nishbox nishbox32.zip"
-						sh "cd .."
-						sh "cd nsis"
-						sh "makensis -DCONFIG=Release -DPLATFORM=Win32 install.nsi"
-						sh "mv install.exe install32.exe"
+						dir("nishbox") {
+							sh "premake5 gmake --engine=dynamic --opengl=gdi --prefix=C:/Games"
+							sh "gmake config=release_win32 -j9"
+							sh "pack -d data base.pak"
+							sh "./tool/pack.sh Win32 nishbox nishbox32.zip"
+						}
+						dir("nsis") {
+							sh "makensis -DCONFIG=Release -DPLATFORM=Win32 install.nsi"
+							sh "mv install.exe install32.exe"
+						}
 						archiveArtifacts(
 							"nishbox/nishbox32.zip, nsis/install32.exe"
 						)
