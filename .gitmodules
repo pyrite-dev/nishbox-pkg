@@ -1,0 +1,3 @@
+[submodule "nishbox"]
+	path = nishbox
+	url = ../nishbox
